@@ -241,8 +241,16 @@ embeddings = HuggingFaceEmbeddings(
     model_kwargs={'device': 'cpu'},
     encode_kwargs={'normalize_embeddings': True}
 )
-db = FAISS.load_local("vector_db", embeddings, allow_dangerous_deserialization=True)
-db_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 4})
+try:
+    db = FAISS.load_local(
+        "vector_db",
+        embeddings,
+        allow_dangerous_deserialization=True
+    )
+except Exception as e:
+    st.error(f"Vector database error: {e}")
+    st.stop()
+    db_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
 # Define the prompt template
 prompt_template = """
