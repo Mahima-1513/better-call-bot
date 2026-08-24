@@ -250,6 +250,7 @@ try:
 except Exception as e:
     st.error(f"Vector database error: {e}")
     st.stop()
+    
     db_retriever = db.as_retriever(search_type="similarity", search_kwargs={"k": 4})
 
 # Define the prompt template
