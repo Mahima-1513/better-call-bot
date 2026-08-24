@@ -1,4 +1,4 @@
-faiss-cpu==1.8.0
+faiss-cpu
 groq
 langchain-groq
 PyPDF2
