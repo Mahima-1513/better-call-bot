@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 import time
-import base64
 from PIL import Image
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -21,35 +20,31 @@ custom_css = """
     /* Import Google Fonts */
     @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
     
-    /* Main theme colors */
+    /* Professional navy theme */
     :root {
-        --primary-color: #1c1c1c;
-        --secondary-color: #da2225;
-        --accent-color: #ffeb08;
-        --text-color: #795036;
-        --chat-bg: var(--accent-color);
+        --primary-color: #0f172a;
+        --secondary-color: #2563eb;
+        --accent-color: #38bdf8;
+        --text-color: #e2e8f0;
+        --muted-text: #94a3b8;
+        --user-bg: #1d4ed8;
+        --assistant-bg: #1e293b;
     }
     
     /* Page styling - removing background color overrides */
-.main {
-    color: var(--text-color);
-}
-
-.stApp {
-    color: var(--text-color);
-}
-
     .stApp {
+        background: #0b1120;
         color: var(--text-color);
     }
     
     /* Header styling */
     .header-container {
-        background: var(--accent-color);
-        color: var(--text-color);
-        padding: 2rem;
-        border-radius: 0 0 20px 20px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #172554 0%, #1e3a8a 55%, #0369a1 100%);
+        color: #ffffff;
+        padding: 2.5rem;
+        border: 1px solid rgba(125, 211, 252, 0.28);
+        border-radius: 18px;
+        box-shadow: 0 12px 32px rgba(2, 6, 23, 0.35);
         margin-bottom: 2rem;
         display: flex;
         align-items: center;
@@ -57,7 +52,7 @@ custom_css = """
     }
     
     .header-text h1, .header-text p {
-        color: var(--text-color) !important;
+        color: #ffffff !important;
     }
     
     .header-image {
@@ -73,77 +68,102 @@ custom_css = """
 
     
     .dancing-script {
-        font-size: 60px;
+        font-size: 58px;
         font-family: 'Dancing Script', cursive !important;
     }
     
     /* Chat container styling */
     .chat-container {
-        max-width: 800px;
+        max-width: 900px;
         margin: 0 auto;
         padding: 20px;
     }
     
     /* Message styling */
-    .stChatMessage {
-        background-color: var(--chat-bg);
-        border-radius: 15px;
-        padding: 15px;
-        margin: 10px 0;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-        color: var(--text-color);
+    div[data-testid="stChatMessage"] {
+        border-radius: 16px;
+        padding: 1rem 1.1rem;
+        margin: 0.8rem 0;
+        border: 1px solid #334155;
+        background: var(--assistant-bg);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+        color: #e2e8f0;
     }
-    
-    /* Make message text white */
-    .stChatMessage p {
-        color: var(--text-color) !important;
+
+    /* Blue bubbles for the user's queries */
+    div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarUser"]) {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        border-color: #60a5fa;
+        margin-left: 10%;
+    }
+
+    /* Slate bubbles for the assistant's answers */
+    div[data-testid="stChatMessage"]:has([data-testid="stChatMessageAvatarAssistant"]) {
+        background: var(--assistant-bg);
+        border-color: #334155;
+        margin-right: 10%;
+    }
+
+    div[data-testid="stChatMessage"] p,
+    div[data-testid="stChatMessage"] li,
+    div[data-testid="stChatMessage"] span {
+        color: #f8fafc !important;
     }
     
     /* Input box styling */
-    .stTextInput input {
-        border-radius: 25px;
-        border: 2px solid var(--accent-color);
-        padding: 10px 20px;
-        background-color: rgba(255, 255, 255, 0.9);
+    div[data-testid="stChatInput"] {
+        border: 1px solid #334155;
+        border-radius: 14px;
+        background: #111827;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    div[data-testid="stChatInput"] textarea {
+        color: #f8fafc !important;
+    }
+
+    div[data-testid="stChatInput"] button {
+        background: #2563eb;
+        color: white;
+        border-radius: 9px;
     }
     
     /* Button styling */
     div.stButton > button:first-child {
-        background-color: var(--secondary-color);
-        color: var(--text-color);
-        border-radius: 25px;
-        padding: 0.5rem 2rem;
-        border: none;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #2563eb;
+        color: #ffffff;
+        border-radius: 10px;
+        padding: 0.5rem 1.2rem;
+        border: 1px solid #60a5fa;
         transition: all 0.3s ease;
     }
     
     div.stButton > button:hover {
-        background-color: var(--accent-color);
-        transform: translateY(-2px);
+        background-color: #1d4ed8;
+        transform: translateY(-1px);
     }
     
     /* Clear Chat button specific styling */
     .clear-chat-button {
-        background-color: #f0f0f0 !important;
-        color: #666666 !important;
+        background-color: #1e293b !important;
+        color: #cbd5e1 !important;
         border-radius: 15px !important;
         padding: 0.3rem 1rem !important;
         font-size: 0.8rem !important;
-        border: 1px solid #dddddd !important;
+        border: 1px solid #475569 !important;
         box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
         transition: all 0.2s ease !important;
     }
     
     .clear-chat-button:hover {
-        background-color: #e0e0e0 !important;
-        border-color: #cccccc !important;
+        background-color: #334155 !important;
+        border-color: #64748b !important;
         transform: translateY(-1px) !important;
     }
     
     /* Status indicator styling */
     div[data-testid="stStatusWidget"] {
-        background-color: var(--secondary-color);
+        background-color: #1e293b;
         border-radius: 10px;
         padding: 10px;
     }
@@ -154,20 +174,21 @@ custom_css = """
     
     /* Legal disclaimer styling */
     .legal-disclaimer {
-        background-color: rgba(218, 34, 37, 0.1);
-        border-left: 4px solid var(--secondary-color);
-        padding: 1rem;
+        background-color: rgba(30, 41, 59, 0.85);
+        border: 1px solid #475569;
+        border-left: 4px solid #f59e0b;
+        padding: 1.15rem;
         margin: 1rem 0;
         border-radius: 4px;
     }
     
     .warning-message {
-        background-color: #fff3cd;
-        color: #856404;
+        background-color: rgba(146, 64, 14, 0.22);
+        color: #fef3c7;
         padding: 10px;
         border-radius: 4px;
         margin: 5px 0;
-        border: 1px solid #ffeeba;
+        border: 1px solid #f59e0b;
     }
 </style>
 """
