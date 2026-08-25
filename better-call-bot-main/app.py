@@ -393,6 +393,10 @@ prompt_template = """
    - Specific legal strategy: Refer to an attorney
    - Complex legal interpretation: Emphasize need for professional counsel
 7. **CRITICAL RULE: NEVER mention or cite non-Indian laws, organizations, or legal bodies (e.g., ABA, NHTSA). Only refer to Indian law and Indian legal bodies.**
+8. Answer ONLY the user's exact question. Do not add unrelated laws, examples, scenarios, facts, or general information.
+9. Keep the answer concise and focused. Include only the details needed to answer the question.
+10. If the question is unclear or missing important context, ask one short clarification question instead of making assumptions.
+11. Do not invent facts, citations, sections, or sources. Use only the provided context when giving legal information.
 
 CONTEXT: {context}
 CHAT HISTORY: {chat_history}
