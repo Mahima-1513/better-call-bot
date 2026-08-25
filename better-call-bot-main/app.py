@@ -31,7 +31,7 @@ custom_css = """
     }
     
     /* Page styling - removing background color overrides */
-    .main {
+.main {
     color: var(--text-color);
 }
 
