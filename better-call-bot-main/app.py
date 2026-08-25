@@ -109,6 +109,30 @@ custom_css = """
     div[data-testid="stChatMessage"] span {
         color: #f8fafc !important;
     }
+
+    /* Labels make questions and legal-information responses easy to identify */
+    .chat-role-label {
+        display: inline-block;
+        margin-bottom: 0.55rem;
+        padding: 0.22rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .user-role-label {
+        background: rgba(219, 234, 254, 0.22);
+        border: 1px solid rgba(191, 219, 254, 0.6);
+        color: #dbeafe !important;
+    }
+
+    .assistant-role-label {
+        background: rgba(56, 189, 248, 0.12);
+        border: 1px solid rgba(56, 189, 248, 0.35);
+        color: #7dd3fc !important;
+    }
     
     /* Input box styling */
     div[data-testid="stChatInput"] {
@@ -334,11 +358,17 @@ st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
 # Display chat messages with improved styling
 for message in st.session_state.messages:
+    role = message.get("role")
     with st.chat_message(
-        message.get("role"),
+        role,
         avatar="👤" if message.get("role") == "user" else "⚖️"
     ):
         content = message.get("content")
+        if role == "user":
+            st.markdown('<div class="chat-role-label user-role-label">Your legal query</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="chat-role-label assistant-role-label">Legal assistant response</div>', unsafe_allow_html=True)
+
         # Split content into main response and sources if sources exist
         if "Sources:" in content:
             main_content, sources = content.split("Sources:", 1)
@@ -357,12 +387,14 @@ input_prompt = st.chat_input("Ask your legal question...")
 
 if input_prompt:
     with st.chat_message("user", avatar="👤"):
+        st.markdown('<div class="chat-role-label user-role-label">Your legal query</div>', unsafe_allow_html=True)
         st.write(input_prompt)
 
     st.session_state.messages.append({"role": "user", "content": input_prompt})
     st.session_state.chat_history.add_user_message(input_prompt)
 
     with st.chat_message("assistant", avatar="⚖️"):
+        st.markdown('<div class="chat-role-label assistant-role-label">Legal assistant response</div>', unsafe_allow_html=True)
         with st.status("Analyzing your question...", expanded=True):
             # Retrieve relevant documents
             docs = db_retriever.invoke(input_prompt)
