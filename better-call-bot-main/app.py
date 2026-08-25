@@ -32,12 +32,12 @@ custom_css = """
     
     /* Page styling - removing background color overrides */
     .main {
-        color: var(--text-color);
-    .stApp {
-        color: var(--text-color);
-    }
+    color: var(--text-color);
+}
 
-    }
+.stApp {
+    color: var(--text-color);
+}
 
     .stApp {
         color: var(--text-color);
@@ -220,7 +220,7 @@ try:
 
 except Exception as e:
     st.error(f"Unable to load image: {e}")
-    
+
 # Add disclaimer before chat interface
 disclaimer_text = """
 <div class="legal-disclaimer" style="color:#ffffff;" >
@@ -258,6 +258,9 @@ embeddings = HuggingFaceEmbeddings(
 )
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+image_path = os.path.join(BASE_DIR, "saul.png")
+
 VECTOR_DB_PATH = os.path.join(BASE_DIR, "vector_db")
 
 db = FAISS.load_local(
