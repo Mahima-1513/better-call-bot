@@ -54,6 +54,36 @@ custom_css = """
     .header-text h1, .header-text p {
         color: #ffffff !important;
     }
+
+    .brand-kicker {
+        display: inline-block;
+        margin-bottom: 0.8rem;
+        padding: 0.35rem 0.75rem;
+        border: 1px solid rgba(186, 230, 253, 0.45);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.1);
+        color: #dff6ff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .hero-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+        margin-top: 1.25rem;
+    }
+
+    .hero-feature {
+        padding: 0.35rem 0.7rem;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.28);
+        border: 1px solid rgba(226, 232, 240, 0.2);
+        color: #e0f2fe;
+        font-size: 0.82rem;
+    }
     
     .header-image {
         flex-shrink: 0;
@@ -214,6 +244,33 @@ custom_css = """
         margin: 5px 0;
         border: 1px solid #f59e0b;
     }
+
+    .quick-start-title {
+        margin: 1.4rem 0 0.5rem;
+        color: #e2e8f0;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .quick-start-copy {
+        margin-bottom: 0.8rem;
+        color: #94a3b8;
+        font-size: 0.9rem;
+    }
+
+    div[data-testid="stHorizontalBlock"] div.stButton > button[kind="primary"] {
+        min-height: 70px;
+        width: 100%;
+        text-align: left;
+        background: linear-gradient(145deg, #172554, #1e293b);
+        border: 1px solid #334155;
+        color: #dbeafe;
+    }
+
+    div[data-testid="stHorizontalBlock"] div.stButton > button[kind="primary"]:hover {
+        border-color: #38bdf8;
+        background: linear-gradient(145deg, #1e3a8a, #0f3b5c);
+    }
 </style>
 """
 
@@ -238,13 +295,18 @@ try:
         st.markdown("""
             <div class="header-container">
                 <div class="header-text">
+                    <div class="brand-kicker">⚖ Indian legal information assistant</div>
                     <h1>
                         <span class="dancing-script">Better Call Bot!</span>
                     </h1>
                     <p>
-                        Did you know that you have rights?
-                        The Constitution says you do. And so do I.
+                        Clear legal information, grounded in Indian legal documents.
                     </p>
+                    <div class="hero-features">
+                        <span class="hero-feature">⚡ Quick answers</span>
+                        <span class="hero-feature">📚 Document-based context</span>
+                        <span class="hero-feature">🔒 General information only</span>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
@@ -354,6 +416,21 @@ def format_chat_history():
     return history_text
 
 # Chat interface
+st.markdown('<div class="quick-start-title">Start with a topic</div>', unsafe_allow_html=True)
+st.markdown('<div class="quick-start-copy">Choose a common question or write your own below.</div>', unsafe_allow_html=True)
+
+quick_question_columns = st.columns(3)
+quick_questions = [
+    ("⚖️ Arrest rights", "What are my rights if I am arrested in India?"),
+    ("📄 FIR basics", "What is an FIR and how can I file one?"),
+    ("🏠 Consumer rights", "What are my consumer rights for a defective product?"),
+]
+
+for column, (label, question) in zip(quick_question_columns, quick_questions):
+    with column:
+        if st.button(label, type="primary", use_container_width=True):
+            st.session_state.pending_question = question
+
 st.markdown('<div class="chat-container">', unsafe_allow_html=True)
 
 # Display chat messages with improved styling
@@ -384,6 +461,8 @@ def check_for_risky_content(response):
 
 # Chat input with custom styling
 input_prompt = st.chat_input("Ask your legal question...")
+if not input_prompt and "pending_question" in st.session_state:
+    input_prompt = st.session_state.pop("pending_question")
 
 if input_prompt:
     with st.chat_message("user", avatar="👤"):
