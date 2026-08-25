@@ -184,28 +184,43 @@ st.markdown(custom_css, unsafe_allow_html=True)
 
 # Header section
 try:
-    image_path = "saul.png"
+    image_path = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "saul.png"
+    )
+
     if os.path.exists(image_path):
         with open(image_path, "rb") as f:
             image_data = f.read()
             encoded_image = base64.b64encode(image_data).decode()
-            
+
         st.markdown(f"""
             <div class="header-container">
                 <div class="header-text">
                     <h1 style="color: white; font-size: 2.5rem;">
                         <span class="dancing-script">Better Call Bot!</span>
                     </h1>
-                    <p style="color: #e0e0e0; font-size: 1.2rem;">Did you know that you have rights? The Constitution says you do. And so do I.</p>
+                    <p style="color: #e0e0e0; font-size: 1.2rem;">
+                        Did you know that you have rights?
+                        The Constitution says you do. And so do I.
+                    </p>
                 </div>
+
                 <div class="header-image">
-                    <img src="data:image/jpeg;base64,{encoded_image}" alt="Saul Goodman">
+                    <img
+                        src="data:image/png;base64,{encoded_image}"
+                        alt="Saul Goodman"
+                    >
                 </div>
             </div>
         """, unsafe_allow_html=True)
+
+    else:
+        st.warning(f"Image not found: {image_path}")
+
 except Exception as e:
     st.error(f"Unable to load image: {e}")
-
+    
 # Add disclaimer before chat interface
 disclaimer_text = """
 <div class="legal-disclaimer" style="color:#ffffff;" >
