@@ -190,37 +190,35 @@ try:
     )
 
     if os.path.exists(image_path):
-        with open(image_path, "rb") as f:
-            image_data = f.read()
-            encoded_image = base64.b64encode(image_data).decode()
-
-        st.markdown(f"""
+        st.markdown("""
             <div class="header-container">
                 <div class="header-text">
-                    <h1 style="color: white; font-size: 2.5rem;">
+                    <h1>
                         <span class="dancing-script">Better Call Bot!</span>
                     </h1>
-                    <p style="color: #e0e0e0; font-size: 1.2rem;">
+                    <p>
                         Did you know that you have rights?
                         The Constitution says you do. And so do I.
                     </p>
                 </div>
-
-                <div class="header-image">
-                    <img
-                        src="data:image/png;base64,{encoded_image}"
-                        alt="Saul Goodman"
-                    >
-                </div>
             </div>
         """, unsafe_allow_html=True)
 
+        col1, col2, col3 = st.columns([4, 2, 4])
+
+        with col2:
+            st.image(
+                Image.open(image_path),
+                width=220
+            )
+
     else:
-        st.warning(f"Image not found: {image_path}")
+        st.warning("Saul image not found.")
 
 except Exception as e:
     st.error(f"Unable to load image: {e}")
-
+    
+    
 # Add disclaimer before chat interface
 disclaimer_text = """
 <div class="legal-disclaimer" style="color:#ffffff;" >
